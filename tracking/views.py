@@ -114,14 +114,14 @@ def stats(request):
             max_c = v
             most_common_color = k
 
-    context = {'avg_coords', avg_coords,
-               'most_common_act', most_common_act,
-               'most_common_resp', most_common_resp,
-               'most_common_sound',most_common_sound,
-               'most_common_color', most_common_color
+    context = {'avg_coords': avg_coords,
+               'most_common_act': most_common_act,
+               'most_common_resp': most_common_resp,
+               'most_common_sound':most_common_sound,
+               'most_common_color': most_common_color
     }
 
-    return render(request,'stats.html',context)
+    return render(request,'tracking/stats.html',context)
 
 
 class Point:
