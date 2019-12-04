@@ -1,61 +1,68 @@
 from django.core.management.base import BaseCommand, CommandError
 from tracking.models import Sighting
-import datetime
+import pandas as pd
+
 
 class Command(BaseCommand):
-    help = 'Closes the specified poll for voting'
+    help = 'Syntax: python manage.py export_squirrel_data path/to/file.csv'
 
     def add_arguments(self, parser):
         parser.add_argument('path', nargs='+', type=str)
 
-    @staticmethod
-    def to_bool(s):
-        if s == 'TRUE':
-            return True
-        if s == 'FALSE':
-            return False
-
     def handle(self, *args, **options):
 
         path = options['path'][0]
-        f = open(path, 'r')
-        for row in f.readlines():
-            row = row.split(',')
-            s = Sighting()
-            s.Latitude = row[0]
-            s.Longitude = row[1]
-            s.Unique_Squirrel_ID = row[2]
-            s.Shift = row[4]
-            s.Date = datetime.date(row[5][4:],row[5][:2],row[5][2:4])
-            s.Age = row[7]
-            s.Primary_Fur_Color = row[8]
-            s.Location = row[12]
-            s.Specific_Location = row[14]
-            s.Running = Command.to_bool(row[15])
-            s.Chasing = Command.to_bool(row[16])
-            s.Climbing = Command.to_bool(row[17])
-            s.Eating = Command.to_bool(row[18])
-            s.Foraging = Command.to_bool(row[19])
-            s.Other_Activities = row[20]
-            s.Kuks = Command.to_bool(row[21])
-            s.Quaas = Command.to_bool(row[22])
-            s.Moans = Command.to_bool(row[23])
-            s.Tail_flags = Command.to_bool(row[24])
-            s.Tail_twitches = Command.to_bool(row[25])
-            s.Approaches = Command.to_bool(row[26])
-            s.Indifferent = Command.to_bool(row[27])
-            s.Runs_from = Command.to_bool(row[28])
+        sightings = Sighting.objects.all()
 
-            s.save()
-            break
+        row = {'X':[],
+               'Y':[],
+               'Unique Squirrel ID': [],
+               'Shift':[],
+               'Date':[],
+               'Age':[],
+               'Primary Fur Color': [],
+               'Location': [],
+               'Specific Location': [],
+               'Running': [],
+               'Chasing': [],
+               'Climbing': [],
+               'Eating': [],
+               'Foraging': [],
+               'Other Activities': [],
+               'Kuks': [],
+               'Quaas': [],
+               'Moans': [],
+               'Tail flags': [],
+               'Tail twitches': [],
+               'Approaches': [],
+               'Indifferent': [],
+               'Runs from': []
+               }
 
-        # for poll_id in options['path']:
-        #     try:
-        #         poll = Poll.objects.get(pk=poll_id)
-        #     except Poll.DoesNotExist:
-        #         raise CommandError('Poll "%s" does not exist' % poll_id)
-        #
-        #     poll.opened = False
-        #     poll.save()
+        for s in sightings:
+            row['X'].append(s.Latitude)
+            row['Y'].append(s.Longitude)
+            row['Unique Squirrel ID'].append(s.Unique_Squirrel_ID)
+            row['Shift'].append(s.Shift)
+            row['Date'].append(s.Date)
+            row['Age'].append(s.Age.replace('nan',''))
+            row['Primary Fur Color'].append(s.Primary_Fur_Color.replace('nan',''))
+            row['Location'].append(s.Location.replace('nan',''))
+            row['Specific Location'].append(s.Specific_Location.replace('nan',''))
+            row['Running'].append(str(s.Running).upper())
+            row['Chasing'].append(str(s.Chasing).upper())
+            row['Climbing'].append(str(s.Climbing).upper())
+            row['Eating'].append(str(s.Eating).upper())
+            row['Foraging'].append(str(s.Foraging).upper())
+            row['Other Activities'].append(s.Other_Activities.replace('nan',''))
+            row['Kuks'].append(str(s.Kuks).upper())
+            row['Quaas'].append(str(s.Quaas).upper())
+            row['Moans'].append(str(s.Moans).upper())
+            row['Tail flags'].append(str(s.Tail_flags).upper())
+            row['Tail twitches'].append(str(s.Tail_twitches).upper())
+            row['Approaches'].append(str(s.Approaches).upper())
+            row['Indifferent'].append(str(s.Indifferent).upper())
+            row['Runs from'].append(str(s.Runs_from).upper())
 
-        self.stdout.write(self.style.SUCCESS(path))
+        df = pd.DataFrame.from_dict(row, orient='columns')
+        df.to_csv(path,index=False)
