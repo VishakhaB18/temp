@@ -22,7 +22,7 @@ class Command(BaseCommand):
             s.Longitude = row['Y']
             s.Unique_Squirrel_ID = row['Unique Squirrel ID']
             s.Shift = row['Shift']
-            s.Date = datetime.date(int(str(row['Date'])[4:]),int(str(row['Date'])[:2]),int(str(row['Date'])[2:4]))
+            s.Date = row['Date']
             s.Age = row['Age']
             s.Primary_Fur_Color = row['Primary Fur Color']
             s.Location = row['Location']
