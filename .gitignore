@@ -1,4 +1,6 @@
 Django.txt
+.DS_Store
 .idea/*
 .gcloudignore
 *.pyc
+*.cpython-37.pyc
